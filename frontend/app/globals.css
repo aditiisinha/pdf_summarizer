@@ -1,11 +1,11 @@
 @import "tailwindcss";
-@plugin "tailwindcss-animate";
+@import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme {
 
-  --font-sans: var(--font-sans),ui-sa
+  --font-sans: var(--font-sans),ui-sans-serif,system-ui,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
@@ -45,7 +45,8 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
-:root {
+@layer base{
+  :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -114,9 +115,44 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+}
+
+@layer utilities{
+  body{
+    font-family: Arial, Helvetica, sans-serif;
+  }
+}
+h1{
+  @apply text-4xl md:text-6xl xl:text-7xl font-bold;
+}
+h2{
+  @apply text-xl md:text-4xl xl:text-5xl font-bold;
+}
+h3{
+}
+a{
+  @apply hover:cursor-pointer hover:text-rose-600;
+}
+
+button{
+  @apply hover:cursor-pointer bg-rose-600 hover:bg-rose-700 text-white font-medium py-2 px-4 rounded transition-colors duration-200 ease-in-out;
+}
+
+@keyframes gradient-x {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}
+
+.animation-gradient-x {
+  animation: gradient-x 3s ease infinite;
+}
+
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border;
   }
-  
 }
