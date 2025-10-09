@@ -123,10 +123,10 @@
   }
 }
 h1{
-  @apply text-4xl md:text-6xl xl:text-7xl font-bold;
+  @apply text-2xl md:text-4xl xl:text-5xl font-bold;
 }
 h2{
-  @apply text-xl md:text-4xl xl:text-5xl font-bold;
+  @apply text-lg md:text-xl xl:text-2xl font-medium;
 }
 h3{
 }
