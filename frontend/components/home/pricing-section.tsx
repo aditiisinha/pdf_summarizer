@@ -1,6 +1,9 @@
+'use client';
+
 import Link from "next/link";
 import BgGradient from "../common/bg-gradient";
 import { cn } from "@/lib/utils";
+import { ArrowRight } from "lucide-react";
 
 type PriceType = {
     name: string;
@@ -8,11 +11,11 @@ type PriceType = {
     description?: string;
     items: string[];
     id: string;
-    paymentLink: string;
-    priceId: string;
+    paymentLink?: string;
+    priceId?: string;
 };
 
-const plans = [
+const plans: PriceType[] = [
     {
         name: "Basic",
         price: 11,
@@ -50,13 +53,19 @@ const PricingCard = ({
     paymentLink,
     priceId,
 }: PriceType) => {
+    const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+        if (!paymentLink) {
+            e.preventDefault();
+            console.log('Payment link not available');
+        }
+    };
+
     return (
-        <div className="relative w-full max-w-lg">
+        <div className="relative w-full max-w-lg hover:scale-105 hover:transition-all hover:duration-300">
             <div
                 className={cn(
                     "relative flex flex-col h-full gap-4 lg:gap-8 z-10 p-8 border-[1px] border-gray-500/20 rounded-2xl",
                     id === "Pro" && "hover:border-rose-500/80 border-2 transition-colors"
-
                 )}
             >
                 <div className="flex flex-col items-center justify-center gap-2 text-center">
@@ -80,17 +89,15 @@ const PricingCard = ({
                     ))}
                 </ul>
 
-                <div className="pt-4">
+                <div className="space-y-2 flex justify-center w-full">
                     <Link
-                        href={paymentLink}
-                        className={cn(
-                            "inline-block w-full text-center py-2 px-4 rounded-lg font-semibold transition-colors",
-                            id === "Pro"
-                                ? "bg-white text-rose-600 hover:bg-gray-100"
-                                : "bg-rose-500 text-white hover:bg-rose-600"
-                        )}
+                        href={paymentLink || '#'}
+                        aria-label={`Get started with ${name} plan`}
+                        className="inline-flex items-center justify-center gap-2 w-full text-center py-3 px-6 
+                        rounded-full font-semibold bg-rose-600 text-white"
+                        onClick={handleClick}
                     >
-                        Buy Now
+                        Buy Now <ArrowRight size={18} />
                     </Link>
                 </div>
             </div>
@@ -101,10 +108,10 @@ const PricingCard = ({
 export default function PricingSection() {
     return (
         <BgGradient>
-            <section className="relative py-16 sm:py-24">
+            <section className="relative overflow-hidden">
                 <div className="py-12 lg:py-24 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 lg:pt-12">
                     <div className="mx-auto max-w-2xl text-center">
-                        <h2 className="font-bold text-2xl uppercase mb-4 text-rose-600">
+                        <h2 className="font-bold text-2xl uppercase mb-8 text-rose-500">
                             Pricing
                         </h2>
                     </div>
@@ -114,7 +121,9 @@ export default function PricingSection() {
                         lg:items-stretch gap-8"
                     >
                         {plans.map((plan) => (
-                            <PricingCard key={plan.id} {...plan} />
+                            <div key={plan.id} className="w-full">
+                                <PricingCard {...plan} />
+                            </div>
                         ))}
                     </div>
                 </div>

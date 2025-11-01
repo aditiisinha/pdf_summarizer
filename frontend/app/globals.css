@@ -131,7 +131,7 @@ h2{
 h3{
 }
 a{
-  @apply hover:cursor-pointer hover:text-rose-600;
+  @apply hover:cursor-pointer;
 }
 
 button{
