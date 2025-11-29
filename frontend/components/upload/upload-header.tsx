@@ -25,7 +25,7 @@ export default function UploadHeader() {
                 </span>{' '}
                 </div>
                 <div className="mt-2 text-lg leading-8 text-gray-800 max-w-2xl text-center">
-                <p>Upload your PDF files and let Summarium do the magic!</p>
+                <p>Upload your PDF files and let Summarium do the magic✨</p>
                 </div>
             </div>
         )

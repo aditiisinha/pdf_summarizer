@@ -10,20 +10,23 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^6.35.1",
+    "@langchain/core": "^0.1.29",
     "@radix-ui/react-slot": "^1.2.3",
     "@uploadthing/react": "^7.3.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "langchain": "^0.0.189",
     "lucide-react": "^0.542.0",
     "next": "15.5.2",
     "next-themes": "^0.4.6",
+    "pdf-parse": "^1.1.1",
+    "pdfjs-dist": "^3.4.120",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-hot-toast": "^2.6.0",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.3.1",
-    "uploadthing": "^7.7.4",
-    "zod": "^4.1.12"
+    "uploadthing": "^7.7.4"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "@clerk/nextjs": "^6.35.1"
+    "@clerk/nextjs": "^6.35.1",
+    "pdf-parse": "^2.4.5"
   }
 }

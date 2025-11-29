@@ -1,5 +1,6 @@
 'use client';
 
+import { generatePdfSummary } from '../../../actions/upload-actions';
 import UploadFormInput from '@/components/upload/upload-form-input';
 import { useUploadThing } from '@/utils/uploadthing';
 import { toast } from 'sonner';
@@ -30,7 +31,7 @@ export default function UploadForm() {
     },
     onUploadBegin: ({ file }) => {
       console.log('Upload has started for file', file);
-      toast('Uploading file...');
+      toast('📄 Uploading file...');
     },
   });
 
@@ -50,13 +51,17 @@ export default function UploadForm() {
       return;
     }
 
-    toast('Please wait while we process your PDF');
+    toast('Please wait while we process your PDF ✨');
 
     const resp = await startUpload([file]);
 
     if (!resp) {
-      toast.error('Upload failed');
+      toast.error('❌ Upload failed ');
     }
+
+    //parse the pdf using langchain
+    const summary = await generatePdfSummary(resp);
+    console.log(summary);
   };
 
   return (
