@@ -17,7 +17,7 @@ export const ourFileRouter = {
         console.log("Upload completed:", {
           userId: metadata?.userId,
           // FIX: use ufsUrl instead of deprecated url
-          url: file.ufsUrl,
+          ufsUrl: file.ufsUrl,
         });
 
         return {
