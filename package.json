@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "@clerk/nextjs": "^6.35.1",
+    "@neondatabase/serverless": "^1.0.2",
     "pdf-parse": "^2.4.5"
   }
 }

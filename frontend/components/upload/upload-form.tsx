@@ -1,6 +1,6 @@
 'use client';
 
-import { generatePdfSummary } from '../../../actions/upload-actions';
+import { generatePdfSummary, storePdfSummaryAction } from '../../../actions/upload-actions';
 import UploadFormInput from '@/components/upload/upload-form-input';
 import { useUploadThing } from '@/utils/uploadthing';
 import { toast } from 'sonner';
@@ -68,6 +68,7 @@ export default function UploadForm() {
       const { data = null } = result || {};
 
       if (data) {
+        let storeResult: any;
         toast.custom(() => (
           <div className="flex flex-col">
             <span className="font-semibold">📄 Saving PDF</span>
@@ -78,6 +79,21 @@ export default function UploadForm() {
         ));
 
         formRef.current?.reset();
+        if (data.summary) {
+          storeResult = await storePdfSummaryAction({
+            fileUrl: resp[0].serverData.file.ufsUrl,
+            summary: data.summary,
+            title: data.title,
+            fileName: file.name,
+          });
+
+          toast('📄 Summary generated,Your PDF has been successfully summarized and saved ✨');
+
+          formRef.current?.reset();
+          //to do: redirect to [id] summary page 
+
+
+        }
       }
     } catch (error) {
       console.error('Unexpected error:', error);
