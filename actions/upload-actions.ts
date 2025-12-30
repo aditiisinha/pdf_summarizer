@@ -5,6 +5,7 @@ import { generateSummaryFromOpenAi } from '../frontend/lib/openai';
 import { auth, currentUser } from '@clerk/nextjs/server';
 import { formatFileNameAsTitle } from '../frontend/utils/format-utils';
 import { getDbConnection } from '../frontend/lib/db';
+import { revalidatePath } from 'next/cache';
 
 interface StorePdfSummaryArgs {
   fileUrl: string;
@@ -187,10 +188,7 @@ export async function storePdfSummaryAction(
       };
     }
 
-    return {
-      success: true,
-      message: 'PDF Summary saved successfully',
-    };
+   
   } catch (error) {
     console.error("Error in storePdfSummaryAction:", error);
     return {
@@ -199,4 +197,14 @@ export async function storePdfSummaryAction(
         error instanceof Error ? error.message : 'Error saving pdf summary',
     };
   }
+
+  //Revalidate our cache
+  revalidatePath(`/summaries/${savedSummary.id}`);
+   return {
+      success: true,
+      message: 'PDF Summary saved successfully',
+      data: {
+        id: savedSummary.id,
+      }
+    };
 }

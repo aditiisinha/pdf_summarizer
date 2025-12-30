@@ -5,6 +5,7 @@ import UploadFormInput from '@/components/upload/upload-form-input';
 import { useUploadThing } from '@/utils/uploadthing';
 import { toast } from 'sonner';
 import { useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { z } from 'zod';
 
 const schema = z.object({
@@ -23,6 +24,7 @@ const schema = z.object({
 export default function UploadForm() {
   const formRef = useRef<HTMLFormElement>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const { startUpload } = useUploadThing('pdfUploader', {
     onClientUploadComplete: () => {
@@ -90,12 +92,14 @@ export default function UploadForm() {
           toast('📄 Summary generated,Your PDF has been successfully summarized and saved ✨');
 
           formRef.current?.reset();
-          //to do: redirect to [id] summary page 
 
+          //to do: redirect to [id] summary page 
+          router.push(`/summaries/${storeResult.data.id}`);
 
         }
       }
     } catch (error) {
+      setIsLoading(false);
       console.error('Unexpected error:', error);
       toast.error('Something went wrong');
       formRef.current?.reset();
