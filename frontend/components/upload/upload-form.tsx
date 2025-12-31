@@ -1,6 +1,6 @@
 'use client';
 
-import { generatePdfSummary, storePdfSummaryAction } from '../../../actions/upload-actions';
+import { generatePdfSummary, storePdfSummaryAction } from '@/actions/upload-actions';
 import UploadFormInput from '@/components/upload/upload-form-input';
 import { useUploadThing } from '@/utils/uploadthing';
 import { toast } from 'sonner';

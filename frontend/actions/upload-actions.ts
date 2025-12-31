@@ -1,10 +1,10 @@
 'use server';
 
-import { fetchAndExtractPdfText } from '../frontend/lib/langchain';
-import { generateSummaryFromOpenAi } from '../frontend/lib/openai';
+import { fetchAndExtractPdfText } from 'lib/langchain';
+import { generateSummaryFromOpenAi } from 'lib/openai';
 import { auth, currentUser } from '@clerk/nextjs/server';
-import { formatFileNameAsTitle } from '../frontend/utils/format-utils';
-import { getDbConnection } from '../frontend/lib/db';
+import { formatFileNameAsTitle } from 'utils/format-utils';
+import { getDbConnection } from 'lib/db';
 import { revalidatePath } from 'next/cache';
 
 interface StorePdfSummaryArgs {
@@ -188,7 +188,7 @@ export async function storePdfSummaryAction(
       };
     }
 
-   
+
   } catch (error) {
     console.error("Error in storePdfSummaryAction:", error);
     return {
@@ -200,11 +200,11 @@ export async function storePdfSummaryAction(
 
   //Revalidate our cache
   revalidatePath(`/summaries/${savedSummary.id}`);
-   return {
-      success: true,
-      message: 'PDF Summary saved successfully',
-      data: {
-        id: savedSummary.id,
-      }
-    };
+  return {
+    success: true,
+    message: 'PDF Summary saved successfully',
+    data: {
+      id: savedSummary.id,
+    }
+  };
 }
