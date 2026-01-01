@@ -61,14 +61,15 @@ export default function DeleteButton({ summaryId }: DeleteButtonProps) {
                 <DialogFooter>
                     <Button
                         variant="ghost"
-                        className="bg-gray-50 border border-gray-200 hover:text-gray-600 hover:bg-gray-100"
+                        size="sm"
+                        className="!bg-gray-50 !border !border-gray-200 !text-gray-900 hover:!bg-gray-100"
                         onClick={() => setOpen(false)}
                     >
                         Cancel
                     </Button>
                     <Button
                         variant="destructive"
-                        className="bg-gray-900 hover:bg-gray-600"
+                        className="!bg-gray-900 hover:!bg-gray-600"
                         size="sm"
                         onClick={handleDelete}
                     >
