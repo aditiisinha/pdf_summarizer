@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import BgGradient from "../../../../components/common/bg-gradient";
 import SummaryHeader from "../../../../components/summaries/summary-header";
 import SourceInfo from "../../../../components/summaries/source-info";
-import SummaryViewer from "../../../../components/summaries/summary-viewer";
+import { SummaryViewer } from "../../../../components/summaries/summary-viewer";
 import { FileText } from "lucide-react";
 
 export default async function SummaryPage(props: {
