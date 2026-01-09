@@ -19,45 +19,58 @@ export async function generatePdfSummary(
     {
       serverData: {
         userId: string;
-        file: {
-          ufsUrl: string;
-          name: string;
-        };
+        fileUrl: string;
+        fileName: string;
       };
     }
   ]
 ) {
-  if (!uploadResponse) {
+  if (!uploadResponse || !uploadResponse[0]) {
+    console.error("No upload response or empty array received");
     return {
       success: false,
-      message: 'File upload failed',
+      message: 'File upload failed: No response from server',
+      data: null,
+    };
+  }
+
+  const { serverData } = uploadResponse[0];
+
+  if (!serverData) {
+    console.error("Missing serverData in upload response:", JSON.stringify(uploadResponse[0], null, 2));
+    return {
+      success: false,
+      message: 'File upload failed: Server processing data missing',
       data: null,
     };
   }
 
   const {
-    serverData: {
-      userId,
-      file: { ufsUrl: pdfUrl, name: fileName },
-    },
-  } = uploadResponse[0];
+    userId,
+    fileUrl: pdfUrl,
+    fileName,
+  } = serverData;
 
   if (!pdfUrl) {
+    console.error("Missing fileUrl in serverData:", JSON.stringify(serverData, null, 2));
     return {
       success: false,
-      message: 'File upload failed',
+      message: 'File upload failed: File URL not found',
       data: null,
     };
   }
 
   try {
+    console.log("Starting PDF extraction for:", pdfUrl);
     const pdfText = await fetchAndExtractPdfText(pdfUrl);
-    console.log({ pdfText });
+    console.log("PDF extraction complete, length:", pdfText?.length);
 
+    console.log("Starting OpenAI summary generation...");
     const summary = await generateSummaryFromOpenAi(pdfText);
-    console.log({ summary });
+    console.log("OpenAI summary generated, length:", summary?.length);
 
     if (!summary) {
+      console.error("Summary is null or empty");
       return {
         success: false,
         message: 'Failed to generate summary',

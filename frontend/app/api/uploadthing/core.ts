@@ -14,15 +14,16 @@ export const ourFileRouter = {
     })
     .onUploadComplete(async ({ metadata, file }) => {
       try {
+        const fileUrl = file.ufsUrl || (file as any).url;
+
         console.log("Upload completed:", {
           userId: metadata?.userId,
-          // FIX: use ufsUrl instead of deprecated url
-          ufsUrl: file.ufsUrl,
+          ufsUrl: fileUrl,
         });
 
         return {
           userId: metadata?.userId ?? null,
-          fileUrl: file.ufsUrl,
+          fileUrl: fileUrl,
           fileName: file.name
         };
       } catch (err) {

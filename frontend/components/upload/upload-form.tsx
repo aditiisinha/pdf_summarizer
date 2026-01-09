@@ -34,8 +34,8 @@ export default function UploadForm() {
       console.log('Upload error:', err);
       toast.error('Error occurred while uploading');
     },
-    onUploadBegin: ({ file }) => {
-      toast('📄 Uploading file...');
+    onUploadBegin: (fileName) => {
+      toast(`📄 Uploading ${fileName}...`);
     },
   });
 
@@ -66,7 +66,7 @@ export default function UploadForm() {
       }
 
       // Generate summary
-      const result = await generatePdfSummary(resp);
+      const result = await generatePdfSummary(resp as any);
       const { data = null } = result || {};
 
       if (data) {
@@ -83,7 +83,7 @@ export default function UploadForm() {
         formRef.current?.reset();
         if (data.summary) {
           storeResult = await storePdfSummaryAction({
-            fileUrl: resp[0].serverData.file.ufsUrl,
+            fileUrl: resp[0].serverData.fileUrl,
             summary: data.summary,
             title: data.title,
             fileName: file.name,
