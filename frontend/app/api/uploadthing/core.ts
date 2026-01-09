@@ -22,7 +22,8 @@ export const ourFileRouter = {
 
         return {
           userId: metadata?.userId ?? null,
-          file,
+          fileUrl: file.ufsUrl,
+          fileName: file.name
         };
       } catch (err) {
         console.error("Upload callback failed:", err);
