@@ -6,6 +6,7 @@ import { currentUser } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 import { getSummaries } from '@/lib/summaries';
 import EmptySummaryState from '@/components/summaries/empty-summary-state';
+
 export default async function DashboardPage() {
     const user = await currentUser();
     const userId = user?.id;

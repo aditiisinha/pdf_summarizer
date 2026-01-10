@@ -6,6 +6,7 @@ import { auth, currentUser } from '@clerk/nextjs/server';
 import { formatFileNameAsTitle } from 'utils/format-utils';
 import { getDbConnection } from 'lib/db';
 import { revalidatePath } from 'next/cache';
+import { syncUser } from '@/lib/users';
 
 interface StorePdfSummaryArgs {
   fileUrl: string;
@@ -155,32 +156,7 @@ export async function storePdfSummaryAction(
     }
 
     // Ensure user exists in DB
-    try {
-      console.log("Checking if user exists in DB:", userId);
-      const sql = await getDbConnection();
-      const existingUser = await sql`SELECT id FROM users WHERE id = ${userId}`;
-
-      if (existingUser.length === 0) {
-        console.log("User not found in DB, creating...");
-        const email = user.emailAddresses[0]?.emailAddress;
-        const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim();
-
-        if (email) {
-          await sql`
-            INSERT INTO users (id, email, full_name, status) 
-            VALUES (${userId}, ${email}, ${fullName}, 'active')
-            ON CONFLICT (id) DO NOTHING
-          `;
-          console.log("User inserted into DB");
-        } else {
-          console.error("No email found for user, cannot create in DB");
-        }
-      } else {
-        console.log("User exists in DB");
-      }
-    } catch (dbError) {
-      console.error('Error ensuring user exists in DB:', dbError);
-    }
+    await syncUser();
 
     console.log("Saving PDF summary...");
     savedSummary = await savePdfSummary(
