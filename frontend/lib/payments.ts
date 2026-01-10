@@ -32,6 +32,211 @@ export async function handleSubscriptionDeleted({
 }
 
 /**
+ * Handle payment_intent.succeeded webhook (for Stripe Payment Links)
+ */
+export async function handlePaymentIntentSucceeded({
+  paymentIntent,
+  stripe,
+}: {
+  paymentIntent: Stripe.PaymentIntent;
+  stripe: Stripe;
+}) {
+  console.log("[handlePaymentIntentSucceeded] Processing payment intent:", paymentIntent.id);
+
+  try {
+    const sql = await getDbConnection();
+
+    // Get customer details
+    const customerId = paymentIntent.customer as string;
+    if (!customerId) {
+      console.error("[handlePaymentIntentSucceeded] No customer ID found");
+      return;
+    }
+
+    const customer = await stripe.customers.retrieve(customerId);
+    if (customer.deleted) {
+      console.error("[handlePaymentIntentSucceeded] Customer was deleted");
+      return;
+    }
+
+    const email = customer.email;
+    if (!email) {
+      console.error("[handlePaymentIntentSucceeded] No email found for customer");
+      return;
+    }
+
+    console.log("[handlePaymentIntentSucceeded] Customer email:", email);
+
+    // Get subscription details if this is a subscription payment
+    let priceId: string | null = null;
+
+    // Check if invoice exists in metadata or expanded data
+    const invoiceId = (paymentIntent as any).invoice;
+    if (invoiceId) {
+      const invoice = typeof invoiceId === 'string'
+        ? await stripe.invoices.retrieve(invoiceId)
+        : invoiceId;
+
+      const subscriptionId = (invoice as any).subscription;
+      if (subscriptionId) {
+        const subscription = typeof subscriptionId === 'string'
+          ? await stripe.subscriptions.retrieve(subscriptionId)
+          : subscriptionId;
+
+        priceId = subscription.items.data[0]?.price.id || null;
+      }
+    }
+
+    console.log("[handlePaymentIntentSucceeded] Price ID:", priceId);
+
+    // Update user if they exist
+    if (priceId) {
+      const user = await sql`SELECT id FROM users WHERE email = ${email}`;
+
+      if (user.length > 0) {
+        console.log("[handlePaymentIntentSucceeded] Updating user with subscription data");
+        await sql`
+          UPDATE users
+          SET
+            customer_id = ${customerId},
+            price_id = ${priceId},
+            status = 'active'
+          WHERE email = ${email}
+        `;
+      } else {
+        console.warn("[handlePaymentIntentSucceeded] User not found, skipping user update");
+      }
+    }
+
+    // Create payment record
+    const existingPayment = await sql`
+      SELECT id FROM payments WHERE stripe_payment_id = ${paymentIntent.id}
+    `;
+
+    if (existingPayment.length === 0) {
+      console.log("[handlePaymentIntentSucceeded] Creating payment record");
+      await sql`
+        INSERT INTO payments (
+          amount,
+          status,
+          stripe_payment_id,
+          price_id,
+          user_email
+        )
+        VALUES (
+          ${paymentIntent.amount},
+          ${paymentIntent.status},
+          ${paymentIntent.id},
+          ${priceId},
+          ${email}
+        )
+      `;
+      console.log("[handlePaymentIntentSucceeded] Payment record created successfully");
+    } else {
+      console.log("[handlePaymentIntentSucceeded] Payment record already exists");
+    }
+
+  } catch (error) {
+    console.error("[handlePaymentIntentSucceeded] Error:", error);
+    throw error;
+  }
+}
+
+/**
+ * Handle invoice.payment_succeeded webhook (for subscription renewals)
+ */
+export async function handleInvoicePaymentSucceeded({
+  invoice,
+  stripe,
+}: {
+  invoice: Stripe.Invoice;
+  stripe: Stripe;
+}) {
+  console.log("[handleInvoicePaymentSucceeded] Processing invoice:", invoice.id);
+
+  try {
+    const sql = await getDbConnection();
+
+    const customerId = invoice.customer as string;
+    if (!customerId) {
+      console.error("[handleInvoicePaymentSucceeded] No customer ID found");
+      return;
+    }
+
+    const customer = await stripe.customers.retrieve(customerId);
+    if (customer.deleted) {
+      console.error("[handleInvoicePaymentSucceeded] Customer was deleted");
+      return;
+    }
+
+    const email = customer.email;
+    if (!email) {
+      console.error("[handleInvoicePaymentSucceeded] No email found");
+      return;
+    }
+
+    // Get price ID from subscription
+    let priceId: string | null = null;
+    const subscriptionId = (invoice as any).subscription;
+    if (subscriptionId) {
+      const subscription = typeof subscriptionId === 'string'
+        ? await stripe.subscriptions.retrieve(subscriptionId)
+        : subscriptionId;
+
+      priceId = subscription.items.data[0]?.price.id || null;
+    }
+
+    console.log("[handleInvoicePaymentSucceeded] Customer:", email, "Price ID:", priceId);
+
+    // Update user
+    if (priceId) {
+      const user = await sql`SELECT id FROM users WHERE email = ${email}`;
+
+      if (user.length > 0) {
+        await sql`
+          UPDATE users
+          SET
+            customer_id = ${customerId},
+            price_id = ${priceId},
+            status = 'active'
+          WHERE email = ${email}
+        `;
+        console.log("[handleInvoicePaymentSucceeded] User updated successfully");
+      }
+    }
+
+    // Create payment record
+    const existingPayment = await sql`
+      SELECT id FROM payments WHERE stripe_payment_id = ${invoice.id}
+    `;
+
+    if (existingPayment.length === 0 && invoice.amount_paid) {
+      await sql`
+        INSERT INTO payments (
+          amount,
+          status,
+          stripe_payment_id,
+          price_id,
+          user_email
+        )
+        VALUES (
+          ${invoice.amount_paid},
+          ${invoice.status},
+          ${invoice.id},
+          ${priceId},
+          ${email}
+        )
+      `;
+      console.log("[handleInvoicePaymentSucceeded] Payment record created");
+    }
+
+  } catch (error) {
+    console.error("[handleInvoicePaymentSucceeded] Error:", error);
+    throw error;
+  }
+}
+
+/**
  * Handle Stripe checkout.session.completed webhook
  */
 export async function handleCheckoutSessionCompleted({
@@ -39,63 +244,71 @@ export async function handleCheckoutSessionCompleted({
 }: {
   session: Stripe.Checkout.Session;
 }) {
-  console.log("Checkout session completed:", session.id);
+  console.log("[handleCheckoutSessionCompleted] Processing session:", session.id);
 
-  // 1️⃣ Get DB connection
-  const sql = await getDbConnection();
+  try {
+    // 1️⃣ Get DB connection
+    const sql = await getDbConnection();
 
-  // 2️⃣ Extract required values
-  const customerId = session.customer as string | null;
-  const priceId = session.line_items?.data[0]?.price?.id ?? null;
+    // 2️⃣ Extract required values
+    const customerId = session.customer as string | null;
+    const priceId = session.line_items?.data[0]?.price?.id ?? null;
 
-  console.log("DEBUG: Extracted values:", { customerId, priceId });
+    console.log("[handleCheckoutSessionCompleted] Extracted values:", { customerId, priceId });
 
-  if (!customerId || !priceId) {
-    console.error("Missing customerId or priceId");
-    return;
+    if (!customerId || !priceId) {
+      console.error("[handleCheckoutSessionCompleted] Missing customerId or priceId");
+      return;
+    }
+
+    // 3️⃣ Fetch Stripe customer
+    const customer = await stripe.customers.retrieve(customerId);
+    console.log("[handleCheckoutSessionCompleted] Retrieved customer from Stripe:", {
+      id: customer.id,
+      deleted: customer.deleted
+    });
+
+    if (customer.deleted) {
+      console.error("[handleCheckoutSessionCompleted] Customer was deleted");
+      return;
+    }
+
+    const email = customer.email;
+    const fullName = customer.name ?? "";
+    console.log("[handleCheckoutSessionCompleted] Customer details:", { email, fullName });
+
+    if (!email) {
+      console.error("[handleCheckoutSessionCompleted] Customer email missing");
+      return;
+    }
+
+    // 4️⃣ Create or update user
+    await createOrUpdateUser({
+      sql,
+      email,
+      fullName,
+      customerId,
+      priceId,
+      status: "active",
+    });
+
+    // 5️⃣ Create payment (idempotent)
+    await createPayment({
+      sql,
+      session,
+      priceId,
+      userEmail: email,
+    });
+
+    console.log("[handleCheckoutSessionCompleted] Webhook processing completed successfully for session:", session.id);
+  } catch (error) {
+    console.error("[handleCheckoutSessionCompleted] Error processing webhook:", error);
+    throw error;
   }
-
-  // 3️⃣ Fetch Stripe customer
-  const customer = await stripe.customers.retrieve(customerId);
-  console.log("DEBUG: Retrived customer from Stripe:", { id: customer.id, deleted: customer.deleted });
-
-  if (customer.deleted) {
-    console.error("Customer was deleted");
-    return;
-  }
-
-  const email = customer.email;
-  const fullName = customer.name ?? "";
-  console.log("DEBUG: Customer details:", { email, fullName });
-
-  if (!email) {
-    console.error("DEBUG ERROR: Customer email missing");
-    return;
-  }
-
-  // 4️⃣ Create or update user
-  await createOrUpdateUser({
-    sql,
-    email,
-    fullName,
-    customerId,
-    priceId,
-    status: "active",
-  });
-
-  // 5️⃣ Create payment (idempotent)
-  await createPayment({
-    sql,
-    session,
-    priceId,
-    userEmail: email,
-  });
-
-  console.log("Webhook processing completed for session:", session.id);
 }
 
 /**
- * Create or update user
+ * Create or update user - Only updates existing users with Stripe data
  */
 async function createOrUpdateUser({
   sql,
@@ -112,32 +325,19 @@ async function createOrUpdateUser({
   priceId: string;
   status: string;
 }) {
-  const user =
-    await sql`SELECT id FROM users WHERE email = ${email}`;
+  try {
+    const user = await sql`SELECT id FROM users WHERE email = ${email}`;
 
-  console.log("DEBUG: User lookup result:", user);
+    console.log("[createOrUpdateUser] User lookup result:", user.length > 0 ? "User found" : "User not found");
 
-  if (user.length === 0) {
-    console.log("DEBUG: User not found, inserting new user");
-    await sql`
-      INSERT INTO users (
-        email,
-        full_name,
-        customer_id,
-        price_id,
-        status
-      )
-      VALUES (
-        ${email},
-        ${fullName},
-        ${customerId},
-        ${priceId},
-        ${status}
-      )
-    `;
-  } else {
-    console.log("DEBUG: User found, updating existing user");
-    await sql`
+    if (user.length === 0) {
+      console.warn("[createOrUpdateUser] User not found in database. User must sign in via Clerk first. Email:", email);
+      console.warn("[createOrUpdateUser] Skipping user creation. Stripe data will be linked when user signs in.");
+      return;
+    }
+
+    console.log("[createOrUpdateUser] Updating existing user with Stripe data");
+    const result = await sql`
       UPDATE users
       SET
         full_name = ${fullName},
@@ -145,7 +345,12 @@ async function createOrUpdateUser({
         price_id = ${priceId},
         status = ${status}
       WHERE email = ${email}
+      RETURNING id
     `;
+    console.log("[createOrUpdateUser] User updated successfully:", result.length > 0 ? "Success" : "No rows updated");
+  } catch (error) {
+    console.error("[createOrUpdateUser] Error updating user:", error);
+    throw error;
   }
 }
 
@@ -163,32 +368,47 @@ async function createPayment({
   priceId: string;
   userEmail: string;
 }) {
-  const existing =
-    await sql`
+  try {
+    const existing = await sql`
       SELECT id
       FROM payments
       WHERE stripe_payment_id = ${session.id}
     `;
 
-  if (existing.length > 0) {
-    console.log("Payment already exists, skipping:", session.id);
-    return;
-  }
+    if (existing.length > 0) {
+      console.log("[createPayment] Payment already exists, skipping:", session.id);
+      return;
+    }
 
-  await sql`
-    INSERT INTO payments (
-      amount,
-      status,
-      stripe_payment_id,
-      price_id,
-      user_email
-    )
-    VALUES (
-      ${session.amount_total},
-      ${session.status},
-      ${session.id},
-      ${priceId},
-      ${userEmail}
-    )
-  `;
+    console.log("[createPayment] Creating new payment record:", {
+      amount: session.amount_total,
+      status: session.status,
+      stripe_payment_id: session.id,
+      price_id: priceId,
+      user_email: userEmail
+    });
+
+    const result = await sql`
+      INSERT INTO payments (
+        amount,
+        status,
+        stripe_payment_id,
+        price_id,
+        user_email
+      )
+      VALUES (
+        ${session.amount_total},
+        ${session.status},
+        ${session.id},
+        ${priceId},
+        ${userEmail}
+      )
+      RETURNING id
+    `;
+
+    console.log("[createPayment] Payment record created successfully:", result.length > 0 ? "Success" : "Failed");
+  } catch (error) {
+    console.error("[createPayment] Error creating payment record:", error);
+    throw error;
+  }
 }

@@ -1,5 +1,5 @@
 import { currentUser } from "@clerk/nextjs/server";
-import { getPriceIdforActiveUsers } from "@/lib/users";
+import { getPriceIdForActiveUser } from "@/lib/users";
 import { plans } from "@/utils/constants";
 import { Crown } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -12,12 +12,7 @@ export default async function PlanBadge() {
         return null;
     }
 
-    const email = user?.emailAddresses?.[0]?.emailAddress;
-    let priceId: string | null = null;
-
-    if (email) {
-        priceId = await getPriceIdforActiveUsers(email);
-    }
+    const priceId = await getPriceIdForActiveUser(user.id);
 
     let planName = 'Buy a plan';
 
