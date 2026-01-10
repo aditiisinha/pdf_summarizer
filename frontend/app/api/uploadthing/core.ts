@@ -22,7 +22,7 @@ export const ourFileRouter = {
 
         return {
           userId: metadata?.userId ?? null,
-          file,
+          file: file as any,
         };
       } catch (err) {
         console.error("Upload callback failed:", err);

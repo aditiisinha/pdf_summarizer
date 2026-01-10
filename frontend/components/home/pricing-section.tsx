@@ -4,6 +4,7 @@ import Link from "next/link";
 import BgGradient from "../common/bg-gradient";
 import { cn } from "@/lib/utils";
 import { ArrowRight } from "lucide-react";
+import { plans } from "@/utils/constants";
 
 type PriceType = {
     name: string;
@@ -15,34 +16,7 @@ type PriceType = {
     priceId?: string;
 };
 
-const plans: PriceType[] = [
-    {
-        name: "Basic",
-        price: 11,
-        description: "Perfect for occasional use",
-        items: [
-            "5 PDF summaries per month",
-            "Standard PDF processing",
-            "Email support",
-        ],
-        id: "Basic",
-        paymentLink: "",
-        priceId: "",
-    },
-    {
-        name: "Pro",
-        price: 51,
-        description: "For professionals and teams",
-        items: [
-            "Unlimited PDF summaries per month",
-            "Priority processing",
-            "24/7 support",
-        ],
-        id: "Pro",
-        paymentLink: "",
-        priceId: "",
-    },
-];
+
 
 const PricingCard = ({
     name,
@@ -77,7 +51,7 @@ const PricingCard = ({
                     <div className="flex items-end gap-2">
                         <p className="text-5xl tracking-tight font-extrabold">{price}</p>
                         <div className="flex flex-col leading-tight">
-                            <p className="text-xs uppercase font-semibold">INR</p>
+                            <p className="text-xs uppercase font-semibold">USD</p>
                             <p className="text-xs">/month</p>
                         </div>
                     </div>

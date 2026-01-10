@@ -34,7 +34,7 @@ export default function UploadForm() {
       console.log('Upload error:', err);
       toast.error('Error occurred while uploading');
     },
-    onUploadBegin: ({ file }) => {
+    onUploadBegin: (fileName) => {
       toast('📄 Uploading file...');
     },
   });
@@ -66,7 +66,7 @@ export default function UploadForm() {
       }
 
       // Generate summary
-      const result = await generatePdfSummary(resp);
+      const result = await generatePdfSummary(resp as any);
       const { data = null } = result || {};
 
       if (data) {
