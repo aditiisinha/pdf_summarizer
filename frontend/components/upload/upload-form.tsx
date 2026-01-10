@@ -35,7 +35,7 @@ export default function UploadForm() {
       toast.error('Error occurred while uploading');
     },
     onUploadBegin: (fileName) => {
-      toast('📄 Uploading file...');
+      toast(`📄 Uploading ${fileName}...`);
     },
   });
 
@@ -83,7 +83,7 @@ export default function UploadForm() {
         formRef.current?.reset();
         if (data.summary) {
           storeResult = await storePdfSummaryAction({
-            fileUrl: resp[0].serverData.file.ufsUrl,
+            fileUrl: resp[0].serverData.fileUrl,
             summary: data.summary,
             title: data.title,
             fileName: file.name,

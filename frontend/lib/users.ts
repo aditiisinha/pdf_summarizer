@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { plans } from "@/utils/constants";
 import { getDbConnection } from "./db";
 import { getUserUploadCount } from "./summaries";
@@ -15,10 +16,30 @@ export async function syncUser() {
             return;
         }
 
+=======
+import { getDbConnection } from './db';
+import { currentUser } from '@clerk/nextjs/server';
+
+export async function syncUser() {
+    const user = await currentUser();
+    if (!user) return null;
+
+    const userId = user.id;
+    const email = user.emailAddresses[0]?.emailAddress;
+    const fullName = `${user.firstName || ''} ${user.lastName || ''} `.trim();
+
+    if (!email) {
+        console.error("No email found for user, cannot sync to DB");
+        return null;
+    }
+
+    try {
+>>>>>>> fd011f5600aa50fbd8a62dd6d3f33665780018c9
         const sql = await getDbConnection();
 
         // Check if user exists
         const existingUser = await sql`SELECT id FROM users WHERE id = ${userId}`;
+<<<<<<< HEAD
         console.log('[syncUser] Existing user check:', existingUser.length > 0 ? 'User exists' : 'User not found');
 
         if (existingUser.length === 0) {
@@ -69,3 +90,22 @@ export async function hasReachedUploadLimit(userId: string) {
         uploadLimit
     };
 }
+=======
+
+        if (existingUser.length === 0) {
+            console.log("User not found in DB, creating...");
+            await sql`
+        INSERT INTO users (id, email, full_name, status) 
+        VALUES (${userId}, ${email}, ${fullName}, 'active')
+        ON CONFLICT (id) DO NOTHING
+      `;
+            console.log("User inserted into DB");
+        }
+
+        return userId;
+    } catch (error) {
+        console.error('Error syncing user to DB:', error);
+        return null;
+    }
+}
+>>>>>>> fd011f5600aa50fbd8a62dd6d3f33665780018c9
