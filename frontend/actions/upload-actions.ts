@@ -20,8 +20,11 @@ export async function generatePdfSummary(
     {
       serverData: {
         userId: string;
-        fileUrl: string;
-        fileName: string;
+        file: {
+          url: string;
+          ufsUrl: string;
+          name: string;
+        };
       };
     }
   ]
@@ -46,14 +49,12 @@ export async function generatePdfSummary(
     };
   }
 
-  const {
-    userId,
-    fileUrl: pdfUrl,
-    fileName,
-  } = serverData;
+  const { userId, file } = serverData;
+  const pdfUrl = file?.ufsUrl || file?.url;
+  const fileName = file?.name;
 
   if (!pdfUrl) {
-    console.error("Missing fileUrl in serverData:", JSON.stringify(serverData, null, 2));
+    console.error("Missing fileUrl (ufsUrl/url) in serverData:", JSON.stringify(serverData, null, 2));
     return {
       success: false,
       message: 'File upload failed: File URL not found',

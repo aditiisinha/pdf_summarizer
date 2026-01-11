@@ -75,8 +75,11 @@ export default function UploadForm() {
 
         formRef.current?.reset();
         if (data.summary) {
+          const serverData = resp[0].serverData as any;
+          const pdfUrl = serverData.file?.ufsUrl || serverData.file?.url || serverData.fileUrl;
+
           storeResult = await storePdfSummaryAction({
-            fileUrl: resp[0].serverData.fileUrl,
+            fileUrl: pdfUrl,
             summary: data.summary,
             title: data.title,
             fileName: file.name,
