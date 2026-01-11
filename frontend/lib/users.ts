@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { plans } from "@/utils/constants";
 import { getDbConnection } from "./db";
 import { getUserUploadCount } from "./summaries";
@@ -14,6 +15,25 @@ export async function syncUser(sessionId?: string) {
             return;
         }
 
+=======
+import { getDbConnection } from './db';
+import { currentUser } from '@clerk/nextjs/server';
+
+export async function syncUser() {
+    const user = await currentUser();
+    if (!user) return null;
+
+    const userId = user.id;
+    const email = user.emailAddresses[0]?.emailAddress;
+    const fullName = `${user.firstName || ''} ${user.lastName || ''} `.trim();
+
+    if (!email) {
+        console.error("No email found for user, cannot sync to DB");
+        return null;
+    }
+
+    try {
+>>>>>>> fd011f5600aa50fbd8a62dd6d3f33665780018c9
         const sql = await getDbConnection();
         const email = user.emailAddresses[0]?.emailAddress;
 
