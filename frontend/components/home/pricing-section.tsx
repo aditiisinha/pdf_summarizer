@@ -121,8 +121,8 @@ export default function PricingSection() {
                     </div>
 
                     <div
-                        className="relative flex justify-center flex-col lg:flex-row items-center 
-                        lg:items-stretch gap-8"
+                        className="relative flex justify-center flex-col md:flex-row items-center 
+                        md:items-stretch gap-8"
                     >
                         {plans.map((plan) => (
                             <div key={plan.id} className="w-full">

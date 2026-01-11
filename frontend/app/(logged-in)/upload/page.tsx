@@ -1,7 +1,8 @@
 import BgGradient from "@/components/common/bg-gradient";
 import UploadHeader from "@/components/upload/upload-header";
 import UploadForm from "@/components/upload/upload-form";
-import { syncUser } from "@/lib/users";
+import { hasReachedUploadLimit, syncUser } from "@/lib/users";
+import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
 export default async function UploadPage(props: {
@@ -15,6 +16,9 @@ export default async function UploadPage(props: {
         redirect('/upload');
     }
 
+    const user = await currentUser();
+    const { hasReachedLimit, planName } = await hasReachedUploadLimit(user?.id || '');
+
     return (
         <BgGradient>
             <section className="min-h-screen">
@@ -22,7 +26,7 @@ export default async function UploadPage(props: {
 
                     <div className="flex flex-col items-center justify-center gap-6 text-center">
                         <UploadHeader />
-                        <UploadForm />
+                        <UploadForm isLimitReached={hasReachedLimit} planName={planName} />
                     </div>
                 </div>
             </section>

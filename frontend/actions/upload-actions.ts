@@ -6,7 +6,7 @@ import { auth, currentUser } from '@clerk/nextjs/server';
 import { formatFileNameAsTitle } from 'utils/format-utils';
 import { getDbConnection } from 'lib/db';
 import { revalidatePath } from 'next/cache';
-import { syncUser } from '@/lib/users';
+import { hasReachedUploadLimit, syncUser } from '@/lib/users';
 
 interface StorePdfSummaryArgs {
   fileUrl: string;
@@ -52,6 +52,16 @@ export async function generatePdfSummary(
   const { userId, file } = serverData;
   const pdfUrl = file?.ufsUrl || file?.url;
   const fileName = file?.name;
+
+  // Check upload limit
+  const { hasReachedLimit } = await hasReachedUploadLimit(userId);
+  if (hasReachedLimit) {
+    return {
+      success: false,
+      message: 'Upload limit reached. Please upgrade to Pro.',
+      data: null,
+    };
+  }
 
   if (!pdfUrl) {
     console.error("Missing fileUrl (ufsUrl/url) in serverData:", JSON.stringify(serverData, null, 2));

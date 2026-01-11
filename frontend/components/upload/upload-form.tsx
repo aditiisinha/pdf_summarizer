@@ -21,7 +21,7 @@ const schema = z.object({
     ),
 });
 
-export default function UploadForm() {
+export default function UploadForm({ isLimitReached = false, planName = "Basic" }: { isLimitReached?: boolean, planName?: string }) {
   const formRef = useRef<HTMLFormElement>(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -104,6 +104,27 @@ export default function UploadForm() {
       setIsLoading(false);
     }
   };
+
+  if (isLimitReached) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-6 p-8 border-2 border-dashed rounded-xl border-rose-200 bg-rose-50/50">
+        <div className="flex flex-col items-center gap-2 text-center">
+          <h3 className="text-xl font-bold text-gray-900">Usage Limit Reached</h3>
+          <p className="text-gray-600 max-w-md">
+            You have reached the maximum number of uploads for your {planName} plan.
+            Please upgrade to continue using Summarium.
+          </p>
+        </div>
+
+        <button
+          onClick={() => router.push('/pricing')}
+          className="px-6 py-3 font-semibold text-white transition-all transform rounded-lg bg-linear-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 hover:scale-105 shadow-lg shadow-rose-200"
+        >
+          Upgrade to Pro 🚀
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-8 w-full max-w-2xl mx-auto">

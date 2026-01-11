@@ -177,7 +177,7 @@ export async function hasReachedUploadLimit(userId: string) {
     const uploadLimit = isPro ? 1000 : 5;
 
     return {
-        hasReachedLimit: Number(uploadCount?.count ?? 0) >= uploadLimit,
+        hasReachedLimit: Number(uploadCount ?? 0) >= uploadLimit,
         uploadLimit,
         planName
     };
