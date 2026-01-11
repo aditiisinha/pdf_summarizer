@@ -10,13 +10,9 @@ export const plans = [
             "Standard PDF processing",
             "Email support",
         ],
-        id: "basic",
-        paymentLink: isDev
-            ? 'https://buy.stripe.com/test_6oUdR9gvH4GF94JcaRdEs00'
-            : '',
-        priceId: isDev
-            ? 'price_1SmhnXFLYKZxhiO1Qkv5quGU'
-            : '',
+        id: "Basic",
+        paymentLink: 'https://buy.stripe.com/test_6oUdR9gvH4GF94JcaRdEs00',
+        priceId: 'price_1SmhnXFLYKZxhiO1Qkv5quGU',
     },
     {
         name: "Pro",
@@ -27,12 +23,8 @@ export const plans = [
             "Priority processing",
             "24/7 support",
         ],
-        id: "pro",
-        paymentLink: isDev
-            ? 'https://buy.stripe.com/test_cNicN5gvH4GF6WBgr7dEs01'
-            : '',
-        priceId: isDev
-            ? 'price_1SmhpXFLYKZxhiO1y3eRtwJm'
-            : '',
+        id: "Pro",
+        paymentLink: 'https://buy.stripe.com/test_cNicN5gvH4GF6WBgr7dEs01',
+        priceId: 'price_1SmhpXFLYKZxhiO1y3eRtwJm',
     },
 ];
