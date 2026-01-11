@@ -17,7 +17,7 @@ export default function Header({ navClassName = "" }: HeaderProps) {
                     <span className="font-extrabold lg:text-xl text-gray-900">Summarium</span></Link>
             </div>
             <div className="flex lg:justify-center gap-4 lg:gap-12 lg:items-center">
-                <NavLink href="/pricing">Pricing</NavLink>
+                <NavLink href="/pricing">Pricing Plans</NavLink>
                 <SignedIn>
                     <NavLink href="/dashboard">Your Summaries</NavLink>
                 </SignedIn>
