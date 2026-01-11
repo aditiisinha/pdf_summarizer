@@ -15,7 +15,7 @@ export default async function DashboardPage() {
         return redirect('/sign-in');
     }
 
-    const { hasReachedLimit, uploadLimit } = await hasReachedUploadLimit(userId);
+    const { hasReachedLimit, uploadLimit, planName } = await hasReachedUploadLimit(userId);
     const summaries = await getSummaries(userId);
 
     return (
@@ -29,25 +29,22 @@ export default async function DashboardPage() {
                         bg-clip-text text-transparent">Your Summaries</h1>
                             <p className="text-lg text-gray-600">Transform your PDFs into concise summaries</p>
                         </div>
-                        {hasReachedLimit && (
-                            <Button
-                                asChild
-                                variant={'link'}
-                                className="bg-linear-to-r from-rose-500 to-rose-700 hover:from-rose-600
-                    hover:to-rose-800 hover:scale-105 transition-all duration-300 
-                    group hover:no-underline">
-                                <Link href="/upload" className="flex items-center text-white">
-                                    <Plus className="w-5 h-5 mr-2" />
-                                    New Summary
-                                </Link>
-                            </Button>
-                        )}
+                        <Button
+                            asChild
+                            className="bg-linear-to-r from-rose-500 to-rose-700 hover:from-rose-600
+                hover:to-rose-800 hover:scale-105 transition-all duration-300 
+                group hover:no-underline h-10 px-8 rounded-lg shadow-md">
+                            <Link href="/upload" className="flex items-center text-white">
+                                <Plus className="w-5 h-5 mr-2" />
+                                New Summary
+                            </Link>
+                        </Button>
                     </div>
                     {hasReachedLimit && (<div className="mb-6">
                         <div className="bg-rose-50 border border-rose-200 
                     rounded-lg p-4 text-rose-800">
                             <p className="text-sm">
-                                You have reached the limit of {uploadLimit} uploads on the Basic plan.{' '}
+                                You have reached the limit of {uploadLimit} uploads on the {planName} plan.{' '}
                                 <Link href="/#pricing"
                                     className="text-rose-600 underline font-medium underline-offset-4
                             inline-flex items-center">

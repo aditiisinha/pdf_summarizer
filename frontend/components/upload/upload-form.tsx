@@ -71,14 +71,7 @@ export default function UploadForm() {
 
       if (data) {
         let storeResult: any;
-        toast.custom(() => (
-          <div className="flex flex-col">
-            <span className="font-semibold">📄 Saving PDF</span>
-            <span className="text-sm opacity-80">
-              Hang tight! We are saving your summary ✨
-            </span>
-          </div>
-        ));
+        toast('📄 Hang tight! We are saving your summary ✨');
 
         formRef.current?.reset();
         if (data.summary) {

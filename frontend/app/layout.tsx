@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Source_Sans_3 as FontSans} from "next/font/google";
+import { Source_Sans_3 as FontSans } from "next/font/google";
 import "./globals.css";
 import Header from '@/components/common/header';
 import Footer from '@/components/common/footer';
@@ -9,7 +9,7 @@ import { Toaster } from "@/components/ui/sonner";
 const fontSans = FontSans({
   variable: "--font-source-sans",
   subsets: ["latin"],
-  weight:["200","300","400","500","600","700","800","900"],
+  weight: ["200", "300", "400", "500", "600", "700", "800", "900"],
 });
 
 const clerkPublishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
@@ -35,17 +35,18 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider publishableKey={clerkPublishableKey}>
-    <html lang="en">
-      <body
-        className={`font-sans ${fontSans.variable}  antialiased`}
-      >
-        <Header />
-        <main>{children}</main>
-        <Footer />
-        <Toaster position="top-right" />
-      </body>
-      
-    </html>
+      <html lang="en">
+        <body
+          className={`font-sans ${fontSans.variable}  antialiased`}
+          suppressHydrationWarning
+        >
+          <Header />
+          <main>{children}</main>
+          <Footer />
+          <Toaster position="top-right" />
+        </body>
+
+      </html>
     </ClerkProvider>
   );
 }

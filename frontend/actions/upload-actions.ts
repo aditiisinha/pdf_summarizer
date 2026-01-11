@@ -76,11 +76,17 @@ export async function generatePdfSummary(
         summary,
       },
     };
-  } catch (error) {
-    console.log(error);
+  } catch (error: any) {
+    console.error('[generatePdfSummary] Error:', error);
+
+    let message = 'File upload failed';
+    if (error?.message === 'RATE_LIMIT_EXCEEDED') {
+      message = 'OpenAI rate limit reached. Please wait a moment and try again.';
+    }
+
     return {
       success: false,
-      message: 'File upload failed',
+      message,
       data: null,
     };
   }

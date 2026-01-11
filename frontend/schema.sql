@@ -10,6 +10,7 @@ CREATE TABLE users (
     full_name VARCHAR(255),
     customer_id VARCHAR(255) UNIQUE,
     price_id VARCHAR(255),
+    plan_name VARCHAR(50),
     status VARCHAR(50) DEFAULT 'inactive'
 );
 
@@ -33,7 +34,7 @@ CREATE TABLE payments (
     status VARCHAR(50) NOT NULL,
     stripe_payment_id VARCHAR(255) UNIQUE NOT NULL,
     price_id VARCHAR(255) NOT NULL,
-    user_email VARCHAR(255) NOT NULL REFERENCES users(email),
+    user_email VARCHAR(255) NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );

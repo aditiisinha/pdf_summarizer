@@ -1,3 +1,4 @@
+import { plans } from "@/utils/constants";
 import Stripe from "stripe";
 import { getDbConnection } from "./db";
 
@@ -94,12 +95,14 @@ export async function handlePaymentIntentSucceeded({
       const user = await sql`SELECT id FROM users WHERE email = ${email}`;
 
       if (user.length > 0) {
-        console.log("[handlePaymentIntentSucceeded] Updating user with subscription data");
+        const planName = plans.find(p => p.priceId === priceId)?.name || 'Unknown';
+        console.log("[handlePaymentIntentSucceeded] Updating user with subscription data. Plan:", planName);
         await sql`
           UPDATE users
           SET
             customer_id = ${customerId},
             price_id = ${priceId},
+            plan_name = ${planName},
             status = 'active'
           WHERE email = ${email}
         `;
@@ -193,11 +196,13 @@ export async function handleInvoicePaymentSucceeded({
       const user = await sql`SELECT id FROM users WHERE email = ${email}`;
 
       if (user.length > 0) {
+        const planName = plans.find(p => p.priceId === priceId)?.name || 'Unknown';
         await sql`
           UPDATE users
           SET
             customer_id = ${customerId},
             price_id = ${priceId},
+            plan_name = ${planName},
             status = 'active'
           WHERE email = ${email}
         `;
@@ -336,13 +341,17 @@ async function createOrUpdateUser({
       return;
     }
 
-    console.log("[createOrUpdateUser] Updating existing user with Stripe data");
+    // Map priceId to plan name
+    const planName = plans.find(p => p.priceId === priceId)?.name || 'Unknown';
+
+    console.log("[createOrUpdateUser] Updating existing user with Stripe data. Plan:", planName);
     const result = await sql`
       UPDATE users
       SET
         full_name = ${fullName},
         customer_id = ${customerId},
         price_id = ${priceId},
+        plan_name = ${planName},
         status = ${status}
       WHERE email = ${email}
       RETURNING id

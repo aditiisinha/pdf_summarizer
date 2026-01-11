@@ -10,7 +10,7 @@ export const plans = [
             "Standard PDF processing",
             "Email support",
         ],
-        id: "Basic",
+        id: "basic",
         paymentLink: isDev
             ? 'https://buy.stripe.com/test_6oUdR9gvH4GF94JcaRdEs00'
             : '',
@@ -27,7 +27,7 @@ export const plans = [
             "Priority processing",
             "24/7 support",
         ],
-        id: "Pro",
+        id: "pro",
         paymentLink: isDev
             ? 'https://buy.stripe.com/test_cNicN5gvH4GF6WBgr7dEs01'
             : '',
