@@ -62,7 +62,7 @@ Summarium is a **production-ready AI SaaS platform** that transforms long, compl
 
 ### AI & Document Processing
 
-* **OpenAI (GPT-4 / GPT-4o)** – Context-aware PDF summarization
+* **OpenAI (GPT-4 / GPT-4o -'mini')** – Context-aware PDF summarization
 * **LangChain** – PDF parsing, chunking, and text extraction
 
 ### Authentication & File Uploads
