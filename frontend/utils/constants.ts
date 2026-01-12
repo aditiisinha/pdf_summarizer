@@ -8,7 +8,6 @@ export const plans = [
         items: [
             "5 PDF summaries per month",
             "Standard PDF processing",
-            "Email support",
         ],
         id: "Basic",
         paymentLink: 'https://buy.stripe.com/test_6oUdR9gvH4GF94JcaRdEs00',
@@ -21,7 +20,6 @@ export const plans = [
         items: [
             "Unlimited PDF summaries per month",
             "Priority processing",
-            "24/7 support",
         ],
         id: "Pro",
         paymentLink: 'https://buy.stripe.com/test_cNicN5gvH4GF6WBgr7dEs01',

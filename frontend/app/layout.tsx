@@ -37,11 +37,11 @@ export default function RootLayout({
     <ClerkProvider publishableKey={clerkPublishableKey}>
       <html lang="en">
         <body
-          className={`font-sans ${fontSans.variable}  antialiased`}
+          className={`font-sans ${fontSans.variable} antialiased flex flex-col min-h-screen`}
           suppressHydrationWarning
         >
           <Header />
-          <main>{children}</main>
+          <main className="flex-grow">{children}</main>
           <Footer />
           <Toaster position="top-right" />
         </body>

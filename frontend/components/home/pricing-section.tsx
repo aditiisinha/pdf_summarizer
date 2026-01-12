@@ -120,6 +120,7 @@ export default function PricingSection() {
                         </h2>
                     </div>
 
+
                     <div
                         className="relative flex justify-center flex-col md:flex-row items-center 
                         md:items-stretch gap-8"
@@ -131,6 +132,38 @@ export default function PricingSection() {
                         ))}
                     </div>
                 </div>
+
+                <div className="mx-auto w-full max-w-5xl mb-12 p-6 border border-rose-500/20 bg-rose-50/50 backdrop-blur-sm rounded-2xl">
+                    <h3 className="text-rose-600 font-bold text-lg mb-2">Test Mode Active</h3>
+
+                    <p className="text-rose-500/80 mb-4 font-medium">
+                        No real payments are being done. Use these card details to test Summarium:
+                    </p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-left bg-white/40 p-4 rounded-xl border border-rose-100">
+                        <div className="space-y-1">
+                            <p className="text-sm text-rose-600/80 font-bold">
+                                Card Number:
+                                <span className="ml-2 inline-block text-rose-700 bg-rose-100/50 px-2 py-1 rounded-md font-mono text-sm whitespace-nowrap">
+                                    4242 4242 4242 4242
+                                </span>
+                            </p>
+                        </div>
+
+                        <div className="space-y-1">
+                            <p className="text-sm text-rose-600/80 font-bold">
+                                Expiry Date: Any future date
+                            </p>
+                        </div>
+
+                        <div className="space-y-1">
+                            <p className="text-sm text-rose-600/80 font-bold">
+                                CVC: Any 3 digits
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
             </section>
         </BgGradient>
     );
